@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:ital,wght@0,400;0,500;0,600;0,700;0,800&display=swap" rel="stylesheet">
+<style>
+  html,body{margin:0;padding:0;background:#0a0a0f;}
+  *{-webkit-tap-highlight-color:transparent;}
+  a{color:#25F4C4;text-decoration:none;}
+  a:hover{color:#5cf0d0;}
+  ::selection{background:rgba(255,60,172,.35);}
+  button{font-family:inherit;}
+  .rt-scroll::-webkit-scrollbar{display:none;}
+</style>
+</helmet>
+<div style="min-height:100vh; background:radial-gradient(130% 75% at 50% -5%, #17121f 0%, #0c0b12 48%, #08080d 100%); font-family:Nunito,system-ui,sans-serif; color:#ececf2;">
+  <div style="max-width:480px; margin:0 auto; min-height:100vh; zoom:{{ zoom }}; position:relative;">
+
+    <!-- ================= HOME ================= -->
+    <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+      <div style="padding:30px 22px 46px;">
+        <div style="font:800 12px/1 Nunito; letter-spacing:.24em; color:#7a7a88; text-transform:uppercase; margin-bottom:12px;">{{ kioskName }}</div>
+        <h1 style="font:600 42px/1.0 Fredoka; color:#fff; margin:0; letter-spacing:-.015em;">Tragos<br>para armar</h1>
+        <div style="height:5px; width:128px; border-radius:99px; margin:16px 0 10px; background:linear-gradient(90deg,#FFB627,#FF3CAC,#25F4C4,#FFE24B); box-shadow:0 0 18px rgba(255,60,172,.5);"></div>
+        <div style="font:500 14.5px/1.45 Nunito; color:#9a9aa8;">22 recetas · con y sin alcohol · formato litro y mini combos</div>
+
+        <div style="margin-top:24px; position:relative;">
+          <span style="position:absolute; left:16px; top:50%; transform:translateY(-50%); color:#5a5a66; font-size:17px;">⌕</span>
+          <input value="{{ q }}" onChange="{{ onSearch }}" placeholder="Buscar un trago…" style="width:100%; box-sizing:border-box; padding:15px 16px 15px 40px; border-radius:16px; border:1px solid rgba(255,255,255,.09); background:#14141c; color:#fff; font:600 16px Nunito; outline:none;">
+        </div>
+
+        <sc-if value="{{ hasResults }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:14px; display:flex; flex-direction:column; gap:8px;">
+            <sc-for list="{{ results }}" as="r" hint-placeholder-count="0">
+              <button onClick="{{ r.onOpen }}" style="display:flex; align-items:center; gap:12px; width:100%; text-align:left; padding:15px 16px; border-radius:14px; border:1px solid rgba(255,255,255,.07); background:#14141c; color:#fff; cursor:pointer;">
+                <span style="flex:none; width:9px; height:9px; border-radius:99px; background:{{ r.color }}; box-shadow:0 0 10px {{ r.color }};"></span>
+                <span style="flex:1; font:700 16px Nunito;">{{ r.name }}</span>
+                <span style="font:700 12px Nunito; color:{{ r.color }};">{{ r.catShort }}</span>
+              </button>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ showCats }}" hint-placeholder-val="{{ true }}">
+          <div style="margin-top:26px; display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+            <sc-for list="{{ categories }}" as="c" hint-placeholder-count="4">
+              <button onClick="{{ c.onOpen }}" style="position:relative; display:flex; flex-direction:column; justify-content:space-between; min-height:158px; padding:18px; border-radius:22px; border:1px solid {{ c.color }}; background:{{ c.colorSoft }}; color:#fff; cursor:pointer; text-align:left; box-shadow:0 0 24px {{ c.colorSoft }}, inset 0 0 34px {{ c.colorSoft }};">
+                <svg width="36" height="36" viewBox="0 0 32 32" fill="none" stroke="{{ c.color }}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="filter:drop-shadow(0 0 7px {{ c.color }});"><path d="{{ c.iconPath }}"></path></svg>
+                <div>
+                  <div style="font:600 20px/1.08 Fredoka; color:{{ c.color }}; text-shadow:0 0 15px {{ c.colorGlow }};">{{ c.name }}</div>
+                  <div style="font:700 12px Nunito; color:#a9a9b6; margin-top:5px;">{{ c.countLabel }}</div>
+                </div>
+              </button>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <div style="margin-top:30px; font:500 12px/1.5 Nunito; color:#55555f; text-align:center;">Tocá una categoría para ver las fichas</div>
+      </div>
+    </sc-if>
+
+    <!-- ================= CATEGORY ================= -->
+    <sc-if value="{{ isCategory }}" hint-placeholder-val="{{ false }}">
+      <div>
+        <div style="position:sticky; top:0; z-index:5; background:rgba(10,10,15,.88); backdrop-filter:blur(14px); border-bottom:1px solid rgba(255,255,255,.06);">
+          <div style="display:flex; align-items:center; gap:12px; padding:16px 18px 12px;">
+            <button onClick="{{ onHome }}" style="flex:none; width:42px; height:42px; border-radius:13px; border:1px solid rgba(255,255,255,.1); background:#14141c; color:#fff; font-size:22px; line-height:1; cursor:pointer;">‹</button>
+            <div style="flex:1;">
+              <div style="font:600 25px/1 Fredoka; color:{{ catColor }}; text-shadow:0 0 16px {{ catColorGlow }};">{{ catName }}</div>
+              <div style="font:700 12px Nunito; color:#8a8a96; margin-top:4px;">{{ catCount }} tragos</div>
+            </div>
+          </div>
+          <div class="rt-scroll" style="display:flex; gap:8px; padding:0 18px 14px; overflow-x:auto; scrollbar-width:none;">
+            <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="4">
+              <button onClick="{{ t.onSelect }}" style="flex:none; padding:9px 15px; border-radius:99px; font:700 13px Nunito; cursor:pointer; white-space:nowrap; border:1px solid {{ t.border }}; background:{{ t.bg }}; color:{{ t.fg }};">{{ t.name }}</button>
+            </sc-for>
+          </div>
+        </div>
+        <div style="padding:16px 18px 44px; display:flex; flex-direction:column; gap:12px;">
+          <sc-for list="{{ drinks }}" as="d" hint-placeholder-count="6">
+            <button onClick="{{ d.onOpen }}" style="position:relative; display:flex; align-items:center; gap:14px; width:100%; text-align:left; padding:18px 16px 18px 22px; border-radius:18px; border:1px solid rgba(255,255,255,.07); background:#14141c; color:#fff; cursor:pointer; overflow:hidden;">
+              <span style="position:absolute; left:0; top:0; bottom:0; width:5px; background:{{ catColor }}; box-shadow:0 0 14px {{ catColor }};"></span>
+              <div style="flex:1; min-width:0;">
+                <div style="font:600 20px/1.12 Fredoka; color:#fff;">{{ d.name }}</div>
+                <div style="display:flex; align-items:center; gap:9px; margin-top:9px; flex-wrap:wrap;">
+                  <span style="font:800 9.5px Nunito; letter-spacing:.11em; padding:4px 9px; border-radius:99px; background:{{ d.badgeBg }}; color:{{ d.badgeFg }}; border:1px solid {{ d.badgeBorder }};">{{ d.alcLabel }}</span>
+                  <span style="font:600 12px Nunito; color:#7f7f8c;">{{ d.rinde }}</span>
+                </div>
+              </div>
+              <span style="flex:none; color:{{ catColor }}; font-size:24px; line-height:1;">›</span>
+            </button>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ================= DRINK ================= -->
+    <sc-if value="{{ isDrink }}" hint-placeholder-val="{{ false }}">
+      <div>
+        <div style="position:sticky; top:0; z-index:5; display:flex; align-items:center; gap:12px; padding:16px 18px; background:rgba(10,10,15,.88); backdrop-filter:blur(14px); border-bottom:1px solid rgba(255,255,255,.06);">
+          <button onClick="{{ onBack }}" style="flex:none; width:42px; height:42px; border-radius:13px; border:1px solid rgba(255,255,255,.1); background:#14141c; color:#fff; font-size:22px; line-height:1; cursor:pointer;">‹</button>
+          <div style="flex:1; text-align:center; font:800 12px Nunito; letter-spacing:.15em; text-transform:uppercase; color:{{ dColor }};">{{ catNameShort }}</div>
+          <div style="flex:none; min-width:42px; text-align:right; font:700 13px Nunito; color:#8a8a96;">{{ counterLabel }}</div>
+        </div>
+
+        <div style="padding:24px 22px 34px;">
+          <span style="display:inline-flex; align-items:center; gap:7px; font:800 11px Nunito; letter-spacing:.12em; padding:6px 12px; border-radius:99px; background:{{ dBadgeBg }}; color:{{ dBadgeFg }}; border:1px solid {{ dBadgeBorder }};">
+            <span style="width:7px; height:7px; border-radius:99px; background:{{ dBadgeFg }}; box-shadow:0 0 8px {{ dBadgeFg }};"></span>{{ dAlcLabel }}
+          </span>
+
+          <h1 style="font:600 42px/1.02 Fredoka; margin:16px 0 12px; color:{{ dColor }}; text-shadow:0 0 28px {{ dColorGlow }}; letter-spacing:-.015em;">{{ dName }}</h1>
+
+          <div style="display:inline-flex; align-items:center; gap:8px; font:600 13px Nunito; color:#b8b8c4; padding:8px 14px; border-radius:12px; background:#14141c; border:1px solid rgba(255,255,255,.07);">
+            <span style="font:800 10px Nunito; letter-spacing:.1em; text-transform:uppercase; color:{{ dColor }};">Rinde</span>{{ rinde }}
+          </div>
+
+          <div style="margin-top:30px; font:800 12px Nunito; letter-spacing:.17em; text-transform:uppercase; color:#7a7a88;">Ingredientes</div>
+          <div style="margin-top:10px; display:flex; flex-direction:column;">
+            <sc-for list="{{ ing }}" as="x" hint-placeholder-count="4">
+              <div style="display:flex; align-items:baseline; gap:15px; padding:12px 0; border-bottom:1px solid rgba(255,255,255,.055);">
+                <sc-if value="{{ x.hasQ }}" hint-placeholder-val="{{ true }}">
+                  <span style="flex:none; min-width:92px; font:700 17px Fredoka; color:{{ dColor }};">{{ x.q }}</span>
+                </sc-if>
+                <sc-if value="{{ x.noQ }}" hint-placeholder-val="{{ false }}">
+                  <span style="flex:none; min-width:92px; font:700 17px Fredoka; color:#45454f; text-align:center;">·</span>
+                </sc-if>
+                <span style="flex:1; font:600 17px/1.32 Nunito; color:#e6e6ee;">{{ x.n }}</span>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="margin-top:32px; font:800 12px Nunito; letter-spacing:.17em; text-transform:uppercase; color:#7a7a88;">Preparación</div>
+          <div style="margin-top:16px; display:flex; flex-direction:column; gap:16px;">
+            <sc-for list="{{ steps }}" as="s" hint-placeholder-count="4">
+              <div style="display:flex; align-items:flex-start; gap:14px;">
+                <span style="flex:none; width:36px; height:36px; border-radius:12px; display:flex; align-items:center; justify-content:center; font:600 18px Fredoka; color:#0a0a0f; background:{{ dColor }}; box-shadow:0 0 16px {{ dColorGlow }};">{{ s.num }}</span>
+                <span style="flex:1; font:600 18px/1.4 Nunito; color:#e9e9f1; padding-top:5px;">{{ s.text }}</span>
+              </div>
+            </sc-for>
+          </div>
+
+          <sc-if value="{{ hasTip }}" hint-placeholder-val="{{ false }}">
+            <div style="margin-top:28px; display:flex; align-items:flex-start; gap:11px; padding:13px 15px; border-radius:14px; background:rgba(255,255,255,.028); border:1px solid rgba(255,255,255,.06);">
+              <span style="flex:none; font:800 10px Nunito; letter-spacing:.11em; color:{{ dColor }}; padding-top:2px;">TIP</span>
+              <span style="flex:1; font:500 13px/1.45 Nunito; color:#9a9aa8;">{{ tip }}</span>
+            </div>
+          </sc-if>
+
+          <div style="margin-top:32px; display:flex; gap:12px;">
+            <button onClick="{{ onPrev }}" disabled="{{ prevDisabled }}" style="flex:1; padding:16px; border-radius:14px; border:1px solid rgba(255,255,255,.1); background:#14141c; color:{{ prevColor }}; font:700 15px Nunito; cursor:pointer;">‹ Anterior</button>
+            <button onClick="{{ onNext }}" disabled="{{ nextDisabled }}" style="flex:1; padding:16px; border-radius:14px; border:1px solid rgba(255,255,255,.1); background:#14141c; color:{{ nextColor }}; font:700 15px Nunito; cursor:pointer;">Siguiente ›</button>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:430,&quot;height&quot;:900},&quot;kioskName&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Recetario del kiosco&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Contenido&quot;},&quot;textZoom&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:1.15,&quot;min&quot;:0.9,&quot;max&quot;:1.35,&quot;step&quot;:0.05,&quot;unit&quot;:&quot;×&quot;,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Lectura&quot;},&quot;showTips&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Contenido&quot;}}">
+class Component extends DCLogic {
+  state = { view:"home", cat:"clasicos", drink:null, q:"" };
+
+  CATS = [
+    { id:"clasicos", name:"Clásicos con alcohol", short:"Clásicos", color:"#FFB627", iconPath:"M5 5 L27 5 L16 17 Z M16 17 V27 M11 27 H21" },
+    { id:"autor", name:"De autor y con golosinas", short:"De autor", color:"#FF3CAC", iconPath:"M9 4 L23 4 L21 28 L11 28 Z M13 4 V1 M23 8 H26" },
+    { id:"sin", name:"Sin alcohol", short:"Sin alcohol", color:"#25F4C4", iconPath:"M9 6 L22 6 L20 28 L11 28 Z M17 6 L22 1" },
+    { id:"combos", name:"Mini combos", short:"Combos", color:"#FFE24B", iconPath:"M8 10 H24 V28 H8 Z M12 10 V7 A4 4 0 0 1 20 7 V10" },
+  ];
+
+  DATA = [
+    { id:1, cat:"clasicos", name:"El Aguante", alc:true, rinde:"1 litro · 4 vasos de 250 ml",
+      ing:[["400 ml","fernet"],["550 ml","Coca-Cola bien fría"],["2 puñados","hielo"],["1 rodaja","naranja"]],
+      steps:["Llenar el envase con hielo hasta la mitad.","Agregar el fernet.","Completar con la Coca-Cola despacio, sin revolver fuerte para no perder gas.","Decorar con la rodaja de naranja y cerrar para entregar."],
+      tip:"Proporción base 40/60. Si tu público toma más fuerte, subí a 45/55." },
+    { id:2, cat:"clasicos", name:"Brisa Botánica", alc:true, rinde:"1 litro · 4 vasos de 250 ml",
+      ing:[["300 ml","gin"],["700 ml","agua tónica bien fría"],["2 puñados","hielo"],["3 rodajas","pepino o limón"]],
+      steps:["Llenar el envase con hielo.","Agregar el gin.","Completar con la tónica despacio.","Decorar con el pepino o limón y cerrar."],
+      tip:"Con un gin más económico rinde mejor margen; con uno premium podés venderlo como línea gourmet." },
+    { id:3, cat:"clasicos", name:"Habana Express", alc:true, rinde:"1 litro · 4 vasos de 250 ml",
+      ing:[["350 ml","ron blanco"],["600 ml","Coca-Cola bien fría"],["50 ml","jugo de limón"],["2 puñados","hielo"],["1 rodaja","lima o limón"]],
+      steps:["Llenar el envase con hielo.","Agregar el ron y el jugo de limón.","Completar con la Coca-Cola.","Decorar y cerrar para entregar."] },
+    { id:4, cat:"clasicos", name:"Amanecer Naranja", alc:true, rinde:"1 litro · 4 vasos de 250 ml",
+      ing:[["350 ml","vodka"],["650 ml","jugo de naranja exprimido o envasado"],["2 puñados","hielo"]],
+      steps:["Llenar el envase con hielo.","Agregar el vodka.","Completar con el jugo de naranja.","Cerrar bien para que no se derrame en el reparto."] },
+    { id:5, cat:"clasicos", name:"Retro Fizz", alc:true, rinde:"1 litro · 4 vasos de 250 ml",
+      ing:[["400 ml","Gancia"],["500 ml","soda"],["100 ml","jugo de limón"],["2 puñados","hielo"],["1 rodaja","limón"]],
+      steps:["Llenar el envase con hielo.","Agregar el Gancia y el jugo de limón.","Completar con la soda.","Decorar con la rodaja de limón."] },
+    { id:6, cat:"clasicos", name:"Atardecer Veneciano", alc:true, rinde:"1 litro · 4 vasos de 250 ml",
+      ing:[["300 ml","Aperol"],["450 ml","vino blanco espumante frío"],["250 ml","soda"],["2 puñados","hielo"],["1 rodaja","naranja"]],
+      steps:["Llenar el envase con hielo.","Agregar el Aperol.","Sumar el espumante despacio.","Terminar con un toque de soda y la rodaja de naranja."],
+      tip:"Armalo lo más cerca posible de la entrega: el espumante pierde burbujas rápido en el traslado." },
+    { id:7, cat:"clasicos", name:"Selva Carioca", alc:true, rinde:"1 litro · 4 vasos de 250 ml",
+      ing:[["350 ml","cachaça"],["aprox. 150 ml","Jugo de 4 limones"],["100 g","azúcar"],["cantidad necesaria","Hielo picado"]],
+      steps:["Machacar el limón con el azúcar en el fondo del envase hasta disolver.","Agregar la cachaça.","Completar con hielo picado y mezclar bien antes de cerrar."] },
+    { id:8, cat:"clasicos", name:"Frutilla Helada", alc:true, rinde:"1 litro · 4 vasos de 250 ml",
+      ing:[["350 ml","ron blanco"],["300 g","frutillas"],["aprox. 80 ml","Jugo de 2 limones"],["80 g","azúcar"],["cantidad necesaria","Hielo"]],
+      steps:["Licuar todos los ingredientes juntos con hielo hasta lograr una textura homogénea.","Envasar de inmediato y mantener en frío o freezer hasta la entrega."],
+      tip:"Este pierde textura rápido: es de los que más conviene preparar sobre pedido, no con anticipación." },
+
+    { id:9, cat:"autor", name:"Pasión Tropical", alc:true, rinde:"1 litro · 4 vasos de 250 ml",
+      ing:[["350 ml","vodka"],["250 ml","pulpa de maracuyá"],["100 ml","jugo de limón"],["80 g","azúcar"],["cantidad necesaria","Hielo"]],
+      steps:["Mezclar la pulpa de maracuyá con el azúcar hasta disolver.","Agregar el vodka y el jugo de limón.","Sumar hielo, mezclar bien y cerrar."] },
+    { id:10, cat:"autor", name:"Sunset de Durazno", alc:true, rinde:"1 litro · 4 vasos de 250 ml",
+      ing:[["350 ml","vodka"],["550 ml","jugo de durazno"],["50 ml","granadina"],["2 puñados","hielo"]],
+      steps:["Llenar el envase con hielo.","Agregar el vodka y el jugo de durazno.","Sumar la granadina sin mezclar del todo para que quede un degradé.","Cerrar y entregar."] },
+    { id:11, cat:"autor", name:"Merienda Sour", alc:true, rinde:"1 litro · 4 vasos de 250 ml",
+      ing:[["400 ml","crema de whisky"],["200 ml","café frío"],["300 ml","leche"],["4","alfajores de maicena chicos (garnish)"],["cantidad necesaria","Hielo"]],
+      steps:["Mezclar la crema de whisky, el café y la leche.","Servir sobre hielo.","Decorar cada vaso con un alfajor chico al momento de entregar (no antes, se humedece)."] },
+    { id:12, cat:"autor", name:"Bombón Explosivo", alc:true, rinde:"1 litro · 4 vasos de 250 ml",
+      ing:[["400 ml","crema de whisky"],["150 ml","crema de leche"],["100 g","crema de avellanas (Nutella o similar)"],["250 ml","leche"],["4","bombones de chocolate y avellana (garnish)"],["cantidad necesaria","Hielo"]],
+      steps:["Batir la crema de avellanas con la leche hasta integrar bien.","Sumar la crema de whisky y la crema de leche.","Servir sobre hielo y coronar cada vaso con un bombón al entregar."],
+      tip:"Es el que más se presta para fotos/reels de producto: cuidá mucho la presentación de este." },
+    { id:13, cat:"autor", name:"Burbuja Azul", alc:true, rinde:"1 litro · 4 vasos de 250 ml",
+      ing:[["300 ml","vodka"],["200 ml","licor azul (curaçao) o jarabe azul"],["500 ml","gaseosa lima-limón"],["","Chicles de bola (garnish)"],["cantidad necesaria","Hielo"]],
+      steps:["Llenar el envase con hielo.","Agregar el vodka y el licor azul.","Completar con la gaseosa despacio.","Decorar cada vaso con un par de chicles al momento de entregar."] },
+    { id:14, cat:"autor", name:"Mandarina Eléctrica", alc:true, rinde:"1 litro · 4 vasos de 250 ml",
+      ing:[["350 ml","vodka"],["550 ml","jugo de mandarina"],["","Caramelos ácidos machacados (para el borde del vaso)"],["cantidad necesaria","Hielo"]],
+      steps:["Humedecer el borde de cada vaso y pasarlo por los caramelos ácidos machacados.","Llenar el envase con hielo, agregar el vodka y completar con el jugo de mandarina.","Servir en los vasos preparados."] },
+
+    { id:15, cat:"sin", name:"Cosecha Sin Culpa", alc:false, rinde:"1 litro · 4 vasos de 250 ml",
+      ing:[["500 ml","jugo de uva"],["300 ml","jugo de naranja"],["200 ml","soda"],["1","manzana cortada en cubos"],["1","naranja en rodajas"]],
+      steps:["Mezclar el jugo de uva con el jugo de naranja.","Agregar la fruta cortada.","Enfriar en la heladera al menos 30 minutos para que la fruta suelte sabor.","Justo antes de entregar, completar con la soda."] },
+    { id:16, cat:"sin", name:"Oasis Tropical", alc:false, rinde:"1 litro · 4 vasos de 250 ml",
+      ing:[["200 g","pulpa de maracuyá"],["150 ml","jugo de limón"],["500 ml","agua"],["60 g","azúcar"],["10 hojas","menta"]],
+      steps:["Licuar la pulpa de maracuyá con el agua y colar para sacar las semillas.","Mezclar con el jugo de limón y el azúcar hasta disolver.","Agregar hielo y las hojas de menta antes de cerrar el envase."] },
+    { id:17, cat:"sin", name:"Isla Blanca", alc:false, rinde:"1 litro · 4 vasos de 250 ml",
+      ing:[["400 ml","jugo de ananá"],["200 ml","leche de coco"],["100 ml","crema de leche"],["cantidad necesaria","Hielo"]],
+      steps:["Licuar todos los ingredientes con hielo hasta lograr una textura cremosa.","Envasar de inmediato y mantener en frío hasta la entrega."] },
+    { id:18, cat:"sin", name:"Nube de Frutilla", alc:false, rinde:"1 litro · 4 vasos de 250 ml",
+      ing:[["300 g","frutillas"],["200 ml","leche condensada"],["300 ml","leche"],["cantidad necesaria","Hielo"]],
+      steps:["Licuar todos los ingredientes con hielo hasta lograr una textura cremosa.","Envasar de inmediato y mantener en frío hasta la entrega."] },
+    { id:19, cat:"sin", name:"Chispa Roja", alc:false, rinde:"1 litro · 4 vasos de 250 ml",
+      ing:[["300 ml","jugo de frutos rojos"],["20 g","jengibre rallado"],["600 ml","agua tónica o soda"],["cantidad necesaria","Hielo"]],
+      steps:["Mezclar el jugo de frutos rojos con el jengibre rallado y dejar reposar 10 minutos en la heladera.","Colar si se prefiere sin la fibra del jengibre.","Completar con la tónica o soda y servir con hielo."] },
+    { id:20, cat:"sin", name:"Oasis Verde", alc:false, rinde:"1 litro · 4 vasos de 250 ml",
+      ing:[["aprox. 120 ml","Jugo de 3 limones"],["20 hojas","menta"],["60 g","azúcar"],["700 ml","soda"],["cantidad necesaria","Hielo"]],
+      steps:["Machacar la menta con el azúcar y el jugo de limón en el fondo del envase.","Agregar hielo.","Completar con la soda despacio y mezclar suave antes de cerrar."] },
+
+    { id:21, cat:"combos", name:"Combo Arranque", alc:true, rinde:"1 combo individual",
+      ing:[["1","botella chica de fernet (250-450 ml)"],["1","gaseosa cola individual (500 ml)"],["1","vaso descartable"],["1","bolsa chica de hielo"]],
+      steps:["Armar el combo con todos los elementos cerrados y sin mezclar (el cliente arma su propio trago).","Etiquetar con tu logo y entregar en bolsa individual."],
+      tip:"Es el ticket de entrada más bajo de la carta: sirve para captar clientes nuevos y venderles después el formato litro." },
+    { id:22, cat:"combos", name:"Combo Turbo", alc:true, rinde:"1 combo individual",
+      ing:[["1","botella chica de vodka (250-375 ml)"],["1","bebida energizante individual (250 ml)"],["1","vaso descartable"],["1","bolsa chica de hielo"]],
+      steps:["Armar el combo con todos los elementos cerrados y sin mezclar.","Etiquetar con tu logo y entregar en bolsa individual."] },
+  ];
+
+  hexA(hex,a){ const n=parseInt(hex.slice(1),16); return `rgba(${(n>>16)&255},${(n>>8)&255},${n&255},${a})`; }
+
+  go(view, patch){ this.setState({ view, ...patch }, ()=>window.scrollTo(0,0)); }
+  openCategory(id){ this.go("category", { cat:id }); }
+  openDrink(id){ const d=this.DATA.find(x=>x.id===id); this.go("drink", { drink:id, cat:d.cat }); }
+  onHome(){ this.go("home", {}); }
+
+  badge(alc){
+    return alc
+      ? { label:"CON ALCOHOL", bg:"rgba(255,90,90,.12)", fg:"#ff9d9d", border:"rgba(255,120,120,.35)" }
+      : { label:"SIN ALCOHOL", bg:"rgba(45,240,200,.12)", fg:"#5cf0d0", border:"rgba(45,240,200,.35)" };
+  }
+
+  tabsFor(activeId){
+    return this.CATS.map(c=>({
+      name:c.short, active:c.id===activeId,
+      bg:c.id===activeId ? c.color : "#14141c",
+      fg:c.id===activeId ? "#0a0a0f" : "#c5c5cf",
+      border:c.id===activeId ? c.color : "rgba(255,255,255,.1)",
+      onSelect:()=>this.openCategory(c.id),
+    }));
+  }
+
+  renderVals(){
+    const s = this.state;
+    const q = (s.q||"").trim();
+    const zoom = this.props.textZoom ?? 1;
+    const showTips = this.props.showTips ?? true;
+
+    const categories = this.CATS.map(c=>{
+      const count = this.DATA.filter(d=>d.cat===c.id).length;
+      return { name:c.name, iconPath:c.iconPath, color:c.color,
+        colorSoft:this.hexA(c.color,.10), colorGlow:this.hexA(c.color,.55),
+        countLabel:count+" tragos", onOpen:()=>this.openCategory(c.id) };
+    });
+
+    const results = q
+      ? this.DATA.filter(d=>d.name.toLowerCase().includes(q.toLowerCase())).map(d=>{
+          const c=this.CATS.find(x=>x.id===d.cat);
+          return { name:d.name, color:c.color, catShort:c.short, onOpen:()=>this.openDrink(d.id) };
+        })
+      : [];
+
+    const cat = this.CATS.find(c=>c.id===s.cat) || this.CATS[0];
+    const catDrinks = this.DATA.filter(d=>d.cat===cat.id);
+    const drinks = catDrinks.map(d=>{ const b=this.badge(d.alc); return {
+      name:d.name, rinde:d.rinde, alcLabel:b.label,
+      badgeBg:b.bg, badgeFg:b.fg, badgeBorder:b.border,
+      onOpen:()=>this.openDrink(d.id) }; });
+
+    const out = {
+      isHome:s.view==="home", isCategory:s.view==="category", isDrink:s.view==="drink",
+      zoom, kioskName:this.props.kioskName ?? "Recetario del kiosco",
+      q:s.q||"", onSearch:(e)=>this.setState({ q:e.target.value }),
+      hasResults:q.length>0 && results.length>0, showCats:q.length===0, results, categories,
+      catName:cat.name, catColor:cat.color, catColorGlow:this.hexA(cat.color,.5),
+      catCount:catDrinks.length, drinks, tabs:this.tabsFor(cat.id), onHome:()=>this.onHome(),
+    };
+
+    const d = this.DATA.find(x=>x.id===s.drink);
+    if(d){
+      const dc = this.CATS.find(x=>x.id===d.cat);
+      const b = this.badge(d.alc);
+      const list = this.DATA.filter(x=>x.cat===d.cat);
+      const idx = list.findIndex(x=>x.id===d.id);
+      const prevD = list[idx-1], nextD = list[idx+1];
+      Object.assign(out, {
+        dName:d.name, dColor:dc.color, dColorGlow:this.hexA(dc.color,.5),
+        dAlcLabel:b.label, dBadgeBg:b.bg, dBadgeFg:b.fg, dBadgeBorder:b.border,
+        rinde:d.rinde, catNameShort:dc.short,
+        counterLabel:(idx+1)+" / "+list.length,
+        ing:d.ing.map(([q0,n])=>({ q:q0, n, hasQ:!!q0, noQ:!q0 })),
+        steps:d.steps.map((t,i)=>({ num:i+1, text:t })),
+        tip:d.tip||"", hasTip:!!d.tip && showTips,
+        onBack:()=>this.openCategory(d.cat),
+        onPrev:()=>{ if(prevD) this.openDrink(prevD.id); },
+        onNext:()=>{ if(nextD) this.openDrink(nextD.id); },
+        prevDisabled:!prevD, nextDisabled:!nextD,
+        prevColor:prevD ? "#e6e6ee" : "#3d3d47",
+        nextColor:nextD ? "#e6e6ee" : "#3d3d47",
+      });
+    }
+    return out;
+  }
+}
+</script>
+</body>
+</html>
